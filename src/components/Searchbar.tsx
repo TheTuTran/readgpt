@@ -1,6 +1,6 @@
 "use client";
 
-import { Prisma, Subchamber } from "@prisma/client";
+import { Prisma, Novel } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import debounce from "lodash.debounce";
@@ -15,12 +15,14 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/Command";
-import { useOnClickOutside } from "@/hooks/use-on-click-outside";
+import { useOnClickOutside } from "@/hooks/useOnClickOutside";
 import { Users } from "lucide-react";
 
-interface SearchBarProps {}
+interface SearchBarProps {
+  theme: string | undefined;
+}
 
-const SearchBar: FC<SearchBarProps> = ({}) => {
+const SearchBar: FC<SearchBarProps> = ({ theme }) => {
   const [input, setInput] = useState<string>("");
   const pathname = usePathname();
   const commandRef = useRef<HTMLDivElement>(null);
@@ -41,7 +43,6 @@ const SearchBar: FC<SearchBarProps> = ({}) => {
   }, []);
 
   const {
-    isFetching,
     data: queryResults,
     refetch,
     isFetched,
@@ -49,8 +50,8 @@ const SearchBar: FC<SearchBarProps> = ({}) => {
     queryFn: async () => {
       if (!input) return [];
       const { data } = await axios.get(`/api/search?q=${input}`);
-      return data as (Subchamber & {
-        _count: Prisma.SubchamberCountOutputType;
+      return data as (Novel & {
+        _count: Prisma.NovelCountOutputType;
       })[];
     },
     queryKey: ["search-query"],
@@ -64,7 +65,9 @@ const SearchBar: FC<SearchBarProps> = ({}) => {
   return (
     <Command
       ref={commandRef}
-      className="relative rounded-lg border max-w-lg z-50 overflow-visible"
+      className={` ${
+        theme === "dark" ? "dark" : ""
+      } relative rounded-lg border bg-search text-search-foreground max-w-lg z-50 overflow-visible ml-auto`}
     >
       <CommandInput
         onValueChange={(text) => {
@@ -72,26 +75,32 @@ const SearchBar: FC<SearchBarProps> = ({}) => {
           debounceRequest();
         }}
         value={input}
-        className="outline-none border-none focus:border-none focus:outline-none ring-0"
-        placeholder="Search communities..."
+        className={` ${
+          theme === "dark" ? "dark" : ""
+        } text-search-foreground outline-none border-none focus:border-none focus:outline-none ring-0`}
+        placeholder="Search Novels..."
       />
 
       {input.length > 0 && (
-        <CommandList className="absolute bg-white top-full inset-x-0 shadow rounded-b-md">
-          {isFetched && <CommandEmpty>No results found.</CommandEmpty>}
+        <CommandList className="bg-search absolute top-full inset-x-0 shadow rounded-b-md">
+          {isFetched && (
+            <CommandEmpty>
+              <p className="text-search-foreground">No results found.</p>
+            </CommandEmpty>
+          )}
           {(queryResults?.length ?? 0) > 0 ? (
-            <CommandGroup heading="Communities">
-              {queryResults?.map((subchamber) => (
+            <CommandGroup heading="Novels">
+              {queryResults?.map((novel) => (
                 <CommandItem
                   onSelect={(e) => {
-                    router.push(`/c/${e}`);
+                    router.push(`/n/${e}`);
                     router.refresh();
                   }}
-                  key={subchamber.id}
-                  value={subchamber.name}
+                  key={novel.id}
+                  value={novel.title}
                 >
                   <Users className="mr-2 h-4 w-4" />
-                  <a href={`/c/${subchamber.name}`}>c/{subchamber.name}</a>
+                  <a href={`/n/${novel.title}`}>n/{novel.title}</a>
                 </CommandItem>
               ))}
             </CommandGroup>

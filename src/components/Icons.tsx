@@ -3,7 +3,7 @@ import { LucideProps, MessageSquare, User } from "lucide-react";
 export const Icons = {
   user: User,
   logo: ({ className }: LucideProps) => (
-    <img className={className} src="/logoSVG.svg" />
+    <img className={className} src="/readGPTLogo.png" />
   ),
   google: (props: LucideProps) => (
     <svg {...props} viewBox="0 0 24 24">

@@ -13,8 +13,12 @@ import UserAvatar from "./UserAvatar";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 
+interface ExtendedUser extends User {
+  theme?: string;
+}
+
 interface UserAccountNavProps {
-  user: Pick<User, "name" | "image" | "email">;
+  user: Pick<ExtendedUser, "name" | "image" | "email" | "theme">;
 }
 
 const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
@@ -26,12 +30,21 @@ const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
           className="h-8 w-8"
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-white" align="end">
+      <DropdownMenuContent
+        className={`${
+          user.theme === "light" ? "" : "dark"
+        } bg-background text-foreground`}
+        align="end"
+      >
         <div className="flex items-center justify-start gap-2 p-2">
           <div className="flex flex-col space-y-1 leading-none">
             {user.name && <p className="font-medium">{user.name}</p>}
             {user.email && (
-              <p className="w-[200px] truncate text-sm text-zinc-700">
+              <p
+                className={`${
+                  user.theme === "light" ? "" : "dark"
+                } w-[200px] truncate text-sm text-primary`}
+              >
                 {user.email}
               </p>
             )}
@@ -41,11 +54,12 @@ const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem asChild>
-          <Link href="/">Feed</Link>
+          <Link href="/create/n">Create Novel</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/c/create">Create Commnuity</Link>
+          <Link href="/create/c">Create Chapters</Link>
         </DropdownMenuItem>
+
         <DropdownMenuItem asChild>
           <Link href="/settings">Settings</Link>
         </DropdownMenuItem>

@@ -39,6 +39,7 @@
     "typescript": "5.2.2"
   },
   "devDependencies": {
+    "@types/lodash.debounce": "^4.0.7",
     "prisma": "^5.2.0"
   }
 }

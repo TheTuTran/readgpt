@@ -4,30 +4,34 @@ import { Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/Toaster";
 import Providers from "@/components/Providers";
+import Footer from "@/components/Footer";
+import { getAuthSession } from "@/lib/auth";
 
 export const metadata = {
-  title: "Echo",
-  description: "A Reddit clone built with Next.js and TypeScript.",
+  title: "ReadGPT",
+  description: "",
 };
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
   authModal,
 }: {
   children: React.ReactNode;
   authModal: React.ReactNode;
 }) {
+  const session = await getAuthSession();
   return (
-    <html
-      lang="en"
-      className={cn("bg-white text-slate-900 antialias light", inter.className)}
-    >
+    <html lang="en" className={cn("antialias light", inter.className)}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
-      <body className="min-h-screen pt-12 bg-slate-50 antialiased">
+      <body
+        className={`${
+          session?.user.theme === "dark" ? "dark" : ""
+        } min-h-screen pt-12 bg-background text-foreground antialiased`}
+      >
         <Providers>
           <Navbar />
 
@@ -36,6 +40,7 @@ export default function RootLayout({
           <main className="container max-w-7xl mx-auto h-full pt-12">
             {children}
           </main>
+          <Footer />
           <Toaster />
         </Providers>
       </body>
